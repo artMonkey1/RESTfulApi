@@ -17,10 +17,10 @@ class CreateCompaniesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('description');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('chief_id');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('chief_id')->references('id')->on('users');
         });
     }
 

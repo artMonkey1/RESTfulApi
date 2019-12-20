@@ -19,10 +19,13 @@ class CreateOffersTable extends Migration
             $table->string('sender_type');
             $table->unsignedBigInteger('recipient_id');
             $table->string('recipient_type');
+            $table->string('body');
+            $table->string('position');
+            $table->string('salary');
             $table->timestamps();
 
-            $table->foreign('recipient_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('recipient_id')->references('id')->on('users');
+            $table->foreign('sender_id')->references('id')->on('users');
         });
     }
 

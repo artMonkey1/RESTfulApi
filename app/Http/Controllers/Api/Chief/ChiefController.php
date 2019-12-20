@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Chief;
 
 use App\Http\Controllers\Api\ApiController;
+use App\Models\Chief;
 use Illuminate\Http\Request;
 
 class ChiefController extends ApiController
@@ -14,28 +15,9 @@ class ChiefController extends ApiController
      */
     public function index()
     {
-        //
-    }
+        $chiefs = Chief::has('companies')->get();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return response()->json(['data' => $chiefs, 'code' => 200], 200);
     }
 
     /**
@@ -46,40 +28,10 @@ class ChiefController extends ApiController
      */
     public function show($id)
     {
-        //
+        $chief = Chief::has('companies')->findOrFail($id);
+
+        return response()->json(['data' => $chief, 'code' => 200], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }

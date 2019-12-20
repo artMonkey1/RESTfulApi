@@ -24,7 +24,12 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'verified', 'admin'
+        'name',
+        'email',
+        'password',
+        'verified',
+        'verification_token',
+        'admin'
     ];
 
     /**
@@ -33,7 +38,9 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token', 'verification_token'
+        'password',
+        'remember_token',
+        'verification_token'
     ];
 
     /**
@@ -55,8 +62,8 @@ class User extends Authenticatable
         return $this->verified == User::VERIFIED_USER;
     }
 
-    public function generateVerificationCode()
+    public static function generateVerificationCode()
     {
-        return Str::random()(40);
+        return Str::random(40);
     }
 }
