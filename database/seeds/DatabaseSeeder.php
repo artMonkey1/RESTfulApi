@@ -3,6 +3,8 @@
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Company;
+use App\Models\Offer;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -12,12 +14,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $userQuantity = 300;
-        $companyQuantity = 20;
+        $usersQuantity = 300;
+        $companiesQuantity = 20;
+        $offersQuantity = 100;
 
-        factory(User::class, $userQuantity)->create();
-        factory(Company::class, $companyQuantity)->create();
-
+        factory(User::class, $usersQuantity)->create();
+        factory(Company::class, $companiesQuantity)->create();
+        factory(Offer::class, $offersQuantity)->create();
         $this->call(WorkerCompanySeeder::class);
     }
 }

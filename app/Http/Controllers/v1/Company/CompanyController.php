@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\Company;
+namespace App\Http\Controllers\v1\Company;
 
-use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\v1\ApiController;
 use App\Models\Company;
-use Illuminate\Http\Request;
 
 class CompanyController extends ApiController
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +17,7 @@ class CompanyController extends ApiController
     {
         $companies = Company::all();
 
-        return response()->json(['data' => $companies, 'code' => 200], 200);
+        return $this->showCollection($companies);
     }
 
     /**
@@ -30,7 +30,7 @@ class CompanyController extends ApiController
     {
         $company = Company::findOrFail($id);
 
-        return response()->json(['data' => $company, 'code' => 200], 200);
+        return $this->showOne($company);
     }
 
 }

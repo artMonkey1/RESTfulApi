@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Api\User;
+namespace App\Http\Controllers\v1\User;
 
-use App\Http\Controllers\Api\ApiController;
-use App\Http\Requests\UserRequest;
 use App\Models\User;
+use App\Http\Controllers\v1\ApiController;
+use App\Http\Requests\UserRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class UserController extends ApiController
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +20,7 @@ class UserController extends ApiController
     {
         $users = User::all();
 
-        return response()->json(['data' => $users, 'code' => 200], 200);
+        return $this->showCollection($users);
     }
 
     /**
@@ -37,7 +39,7 @@ class UserController extends ApiController
 
         $user = User::create($input);
 
-        return response()->json(['data' => $user, 'code' => 201], 201);
+        return $this->showOne($user,JsonResponse::HTTP_CREATED);
     }
 
     /**
@@ -50,7 +52,7 @@ class UserController extends ApiController
     {
         $user = User::findOrFail($id);
 
-        return response()->json(['data' => $user, 'code' => 200], 200);
+        return $this->showOne($user);
     }
 
     /**
@@ -88,19 +90,19 @@ class UserController extends ApiController
 
         if($request->has('admin')){
             if(!$user->isVerified){
-                return response()->json(['error' => 'Only verified user can modify the admin field', 'code' => 409], 409);
+                return $this->errorResponse('Only verified user can modify the admin field', JsonResponse::HTTP_CONFLICT);
             }
 
             $user->admin = $request->admin;
         }
 
         if($user->isClean()){
-                return response()->json(['error' => 'You need to specify a different fields to update', 'code' => 422], 422);
+                return $this->errorResponse('You need to specify a different fields to update', JsonResponse::HTTP_UNPROCESSABLE_ENTITY );
         }
 
         $user->save();
 
-        return response()->json(['data' => $user, 'code' => 200], 200);
+        return $this->showOne($user);
     }
 
     /**
@@ -114,6 +116,6 @@ class UserController extends ApiController
         $user = User::findOrFail($id);
         $user->delete();
 
-        return response()->json(['data' => $user], 204);
+        return $this->showOne($user, JsonResponse::HTTP_NO_CONTENT);
     }
 }

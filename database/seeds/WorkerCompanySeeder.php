@@ -1,7 +1,8 @@
 <?php
 
 use App\Models\Worker;
-use \App\Models\Company;
+use App\Models\User;
+use App\Models\Company;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 use Faker\Generator as Faker;
@@ -15,7 +16,7 @@ class WorkerCompanySeeder extends Seeder
 
         for($i = 1; $i < 250; $i++){
             $company = Company::all()->random();
-            $worker = Worker::whereVerifide(User::VERIFIED_USER)->except($company->chief->id)->random();
+            $worker = Worker::all()->except($company->chief->id)->random();
 
             $data[] = [
                 'worker_id' => $worker->id,

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\Worker;
+namespace App\Http\Controllers\v1\Worker;
 
-use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\v1\ApiController;
 use App\Models\Worker;
-use Illuminate\Http\Request;
 
 class WorkerController extends ApiController
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +17,7 @@ class WorkerController extends ApiController
     {
         $workers = Worker::all();
 
-        return response()->json(['data' => $workers, 'code' => 200], 200);
+        return $this->showCollection($workers);
     }
 
     /**
@@ -30,6 +30,6 @@ class WorkerController extends ApiController
     {
         $worker = Worker::findOrFail($id);
 
-        return response()->json(['data' => $worker, 'code' => 200], 200);
+        return $this->showOne($worker);
     }
 }
