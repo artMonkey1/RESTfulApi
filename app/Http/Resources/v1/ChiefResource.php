@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources\v1;
 
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\ApiResource;
 
-class ChiefResource extends JsonResource
+class ChiefResource extends ApiResource
 {
     /**
      * Transform the resource into an array.
@@ -16,4 +16,5 @@ class ChiefResource extends JsonResource
     {
         return parent::toArray($request);
     }
+
 }
