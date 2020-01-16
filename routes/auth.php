@@ -11,11 +11,12 @@ Route::group(['namespace' => 'Auth'], function () {
     Route::get('users/{user}/resend', 'ConfirmEmailController@resend')->name('resend');
 
     Route::group(['prefix' => 'password'], function () {
-        Route::post('create', 'PasswordResetController@create');
-        Route::get('find/{token}', 'PasswordResetController@find');
-        Route::post('reset', 'PasswordResetController@reset');
+        Route::post('create', 'PasswordResetController@create')->name('password.reset.create');
+        Route::get('find/{token}', 'PasswordResetController@find')->name('password.reset.find');
+        Route::post('reset', 'PasswordResetController@reset')->name('password.reset');
     });
 });
-    Route::middleware('auth:api')->get('/user', function (Request $request) {
-        return $request->user();
-    });
+
+Route::middleware('auth:api')->get('/user', function (Request $request) {
+    return $request->user();
+});
