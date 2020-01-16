@@ -4,6 +4,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Offer;
+use App\Models\Vacancy;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,11 +17,13 @@ class DatabaseSeeder extends Seeder
     {
         $usersQuantity = 300;
         $companiesQuantity = 20;
-        $offersQuantity = 100;
+        $offersQuantity = 200;
+        $vacancyQuantity = 200;
 
         factory(User::class, $usersQuantity)->create();
         factory(Company::class, $companiesQuantity)->create();
-        factory(Offer::class, $offersQuantity)->create();
+        factory(Vacancy::class, $vacancyQuantity)->create();
         $this->call(WorkerCompanySeeder::class);
+        factory(Offer::class, $offersQuantity)->create();
     }
 }

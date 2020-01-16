@@ -6,13 +6,27 @@ use App\Models\Offer;
 use Faker\Generator as Faker;
 
 $factory->define(Offer::class, function (Faker $faker) {
+
+    //Getting an instances for sender and recipient
     $company = \App\Models\Company::all()->random();
-    $worker = \App\Models\Worker::all()->except($company->chief->id)->random();
+    $applicant = \App\Models\Applicant::where('applicant', \App\Models\User::APPLICANT_USER)->get();
+    $applicant = $applicant->random();
+
+    //Getting a sender
+    $sender = $faker->randomElement([$company, $applicant]);
+    $vacancy = \App\Models\Vacancy::all()->except(['author_type' => get_class($sender)])->random();
+
+    //Getting a recipient
+    if($sender == $applicant){
+        $recipient = $faker->randomElement([$company, $vacancy]);
+    }else{
+        $recipient = $faker->randomElement([$applicant, $vacancy]);
+    }
 
     return [
-            'sender_id' => $sender = $faker->randomElement([$company, $worker]),
+            'sender_id' => $sender->id,
             'sender_type' => get_class($sender),
-            'recipient_id' => ($sender == $worker) ? $recipient = $company : $recipient = $worker,
+            'recipient_id' => $recipient->id,
             'recipient_type' => get_class($recipient),
             'body' => $faker->paragraph(1),
             'position' => $faker->word(),

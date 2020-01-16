@@ -12,40 +12,49 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::group(['namespace' => 'v1'], function() {
+
+Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function() {
+
+    /**
+     * Auth routs
+     */
+    include_once 'auth.php';
+
+    /**
+     * Chiefs routs
+     */
+    include_once 'chiefs.php';
+
+    /**
+     * Applicants routs
+     */
+    include_once 'applicants.php';
 
     /**
      * Users
      */
-    Route::apiResource('users', 'User\UserController');
+    Route::apiResource('users', 'User\UserController')->except(['store']);
 
     /**
-     * Workers
+     * Vacancies
      */
-    Route::apiResource('workers', 'Worker\WorkerController')->only('show', 'index');
-    Route::apiResource('workers.companies', 'Worker\WorkerCompanyController')->except('update', 'store');
-    Route::apiResource('chiefs.companies.workers', 'Worker\CompanyWorkerController')->except('update', 'store');
-
-    /**
-     * Chiefs
-     */
-    Route::apiResource('chiefs', 'Chief\ChiefController')->only('show', 'index');
+    Route::apiResource('vacancies', 'Vacancy\VacancyController')->only(['index', 'show']);
 
     /**
      * Companies
      */
-    Route::apiResource('companies', 'Company\CompanyController')->only('index', 'show');
-    Route::apiResource('chiefs.companies', 'Company\ChiefCompanyController');
-    Route::apiResource('workers.companies', 'Company\WorkerCompanyController')->except('update', 'store');
+    Route::apiResource('companies', 'Company\CompanyController')->only(['index', 'show']);
+    Route::apiResource('companies.vacancies', 'Company\CompanyVacancyController')->only(['index']);
 
+    /**
+     * Workers
+     */
+    Route::apiResource('workers', 'Worker\WorkerController')->only(['show', 'index']);
+    Route::apiResource('workers.companies', 'Worker\WorkerCompanyController')->only(['index', 'destroy']);
     /**
      * Offers
      */
-    Route::apiResource('offers', 'Offer\OfferController')->only('index', 'show');
-    Route::apiResource('chiefs.resume', 'Offer\CompanyOfferController')->except('show', 'store');
-    Route::apiResource('chiefs.companies.resume', 'Offer\CompanyOfferController')->except('show', 'store');
-    Route::apiResource('chiefs.companies.offers', 'Offer\CompanyOfferController')->except('show', 'update');
-    Route::apiResource('workers.companies.resume', 'Offer\WorkerOfferController')->except('show', 'update');
-    Route::apiResource('workers.companies.offers', 'Offer\WorkerOfferController')->except('show', 'store');
-
+    Route::apiResource('offers', 'Offer\OfferController')->only(['index', 'show']);
 });
+
+Route::post('oauth/token', '\Laravel\Passport\Http\Controllers\AccessTokenController@issueToken')->name('passport.token');

@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use App\Http\Resources\v1\UserCollection;
 use App\Http\Resources\v1\UserResource;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Laravel\Passport\HasApiTokens;
 
 /**
  * App\Models\User
@@ -39,19 +38,25 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerificationToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerified($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Client[] $clients
+ * @property-read int|null $clients_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Token[] $tokens
+ * @property-read int|null $tokens_count
  */
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasApiTokens;
+
+    const READ_ONLY_USER = false;
+    const APPLICANT_USER = true;
 
     const REGULAR_USER = false;
     const ADMIN_USER = true;
 
-    const UNVERIFIED_USER = 0;
-    const VERIFIED_USER = 1;
+    const UNVERIFIED_USER = false;
+    const VERIFIED_USER = true;
 
     public $transformer = UserResource::class;
-    public $collectionTransformer = UserCollection::class;
 
     protected $table = 'users';
     /**
@@ -76,7 +81,6 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'verification_token'
     ];
 
     /**
@@ -88,16 +92,25 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * @return bool
+     */
     public function isAdmin()
     {
         return $this->admin == User::ADMIN_USER;
     }
 
+    /**
+     * @return bool
+     */
     public function isVerified()
     {
         return $this->verified == User::VERIFIED_USER;
     }
 
+    /**
+     * @return string
+     */
     public static function generateVerificationCode()
     {
         return Str::random(40);

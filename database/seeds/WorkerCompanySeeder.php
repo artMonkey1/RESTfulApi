@@ -16,7 +16,8 @@ class WorkerCompanySeeder extends Seeder
 
         for($i = 1; $i < 250; $i++){
             $company = Company::all()->random();
-            $worker = Worker::all()->except($company->chief->id)->random();
+            $worker = User::whereVerified(User::VERIFIED_USER)->get();
+            $worker = $worker->random();
 
             $data[] = [
                 'worker_id' => $worker->id,

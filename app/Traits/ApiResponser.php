@@ -3,10 +3,9 @@
 
 namespace App\Traits;
 
-use App\Http\Resources\ApiResource;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 trait ApiResponser
@@ -21,17 +20,14 @@ trait ApiResponser
         return response()->json(['error' => $message, 'code' => $code], $code);
     }
 
-    protected function showCollection(Collection $collection, $code = JsonResponse::HTTP_OK)
+    protected function showCollection($collection)
     {
-        $transformer = $collection->first()->collectionTransformer;
+        $transformer = $collection->first()->transformer;
 
-        $collection = $this->sortData($collection, $transformer);
-        $collection = $this->filterData($collection, $transformer);
-        $collection = $this->paginate($collection);
         $collection = $this->transformData($collection, $transformer);
         $collection = $this->cacheResponse($collection);
 
-        return $this->successResponse($collection, $code);
+        return $collection;
     }
 
     protected function showOne(Model $instance, $code = JsonResponse::HTTP_OK)
@@ -47,54 +43,13 @@ trait ApiResponser
         return $this->successResponse(['data' => $message], $code);
     }
 
-    protected function sortData(Collection $collection, ApiResource $transformer)
+    protected function transformData($data, $transformer)
     {
-        if(request()->has('sort_by')){
-            $attribute  = $transformer::originalAttribute(request()->sort_by);
-            $collection->sortBy->$attribute;
-        }
-        return $collection;
-    }
-
-    protected function filterData(Collection $collection, ApiResource $transformer)
-    {
-        foreach(request()->query() as $query => $value){
-            $attribute = $transformer::originalAttribute($query);
-
-            if(isset($attribute, $value)){
-                $collection->where($attribute, $value);
-            }
+        if($data instanceof Model){
+            return new $transformer($data);
         }
 
-        return $collection;
-    }
-
-    protected function paginate(Collection $collection)
-    {
-        $rules = [
-            'per_page' => ['integer', 'min:2', 'max:50']
-        ];
-        \Validator::validate(request()->all(), $rules);
-
-        $perPage = 15;
-        if(request()->has('per_page')){
-            $perPage = request()->per_page;
-        }
-
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-
-        $result = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
-        $paginator = new LengthAwarePaginator($result, $collection->count(), $perPage, $currentPage, [
-            'path' => LengthAwarePaginator::resolveCurrentPath(),
-        ]);
-        $paginator->appends(request()->all());
-
-        return $paginator;
-    }
-
-    protected function transformData($data, ApiResource $transformer)
-    {
-        return new $transformer($data);
+        return $transformer::collection($data);
     }
 
     protected function cacheResponse($data)

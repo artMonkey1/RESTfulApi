@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use App\Http\Resources\v1\CompanyCollection;
 use App\Http\Resources\v1\CompanyResource;
+use App\Traits\Offerable;
+use EloquentFilter\Filterable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -33,35 +34,48 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Company whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Company whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Offer[] $offersForCompany
+ * @property-read int|null $offers_for_company_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Offer[] $offersFromCompany
+ * @property-read int|null $offers_from_company_count
  */
 class Company extends Model
 {
+    use Offerable;
+
     public $transformer = CompanyResource::class;
-    public $collectionTransformer = CompanyCollection::class;
 
     protected $fillable = [
         'name',
         'description'
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function chief()
     {
         return $this->belongsTo(Chief::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function workers()
     {
-        return $this->belongsToMany(Worker::class,'worker_company');
+        return $this->belongsToMany(Worker::class, 'worker_company')->withPivot('position', 'salary');
     }
 
-    public function resume()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function vacancies()
     {
-        return $this->hasMany(Offer::class, 'recipient_id')->where('recipient_type', App\Models\Company::class);
+        return $this->morphMany(Vacancy::class, 'author');
     }
 
-
-    public function offers()
+    public function path()
     {
-        return $this->hasMany(Offer::class, 'sender_id')->where('sender_id', App\Models\Company::class);
+        return route('companies.show', $this->id);
     }
 }
